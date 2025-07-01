@@ -1,5 +1,6 @@
 package ru.alfabeton.request.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import ru.alfabeton.request.enums.RequestStatus;
 
@@ -12,6 +13,7 @@ public class RequestDto {
 
     private Long id;
 
+    @NotNull
     private Long clientId;
 
     private RequestStatus status;

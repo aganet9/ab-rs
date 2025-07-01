@@ -3,6 +3,7 @@ package ru.alfabeton.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 import ru.alfabeton.request.dto.ProductDto;
 import ru.alfabeton.request.mapper.ProductMapper;
@@ -11,6 +12,7 @@ import ru.alfabeton.request.repository.ProductRepository;
 import java.util.List;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class DefaultProductService  implements ProductService {
 

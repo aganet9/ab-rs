@@ -3,6 +3,7 @@ package ru.alfabeton.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 import ru.alfabeton.request.dto.RequestDto;
 import ru.alfabeton.request.dto.RequestItemDto;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class DefaultRequestService implements RequestService {
 
