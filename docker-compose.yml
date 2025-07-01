@@ -1,0 +1,15 @@
+services:
+  request-db:
+    image: postgres:16
+    container_name: request-db
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: requests
+      POSTGRES_USER: request_user
+      POSTGRES_PASSWORD: request_pass
+    volumes:
+      - request-db-data:/var/lib/postgresql/data
+
+volumes:
+  request-db-data:
