@@ -1,56 +1,7 @@
 databaseChangeLog:
-  - changeSet:
-      id: 1
-      author: aganethed
-      changes:
-        - createTable:
-            tableName: products
-            columns:
-              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true } }
-              - column: { name: category, type: varchar(32) }
-              - column: { name: price_rub, type: "numeric(10,2)" }
-              - column: { name: grade_m, type: smallint }
-              - column: { name: slump_p, type: varchar(8) }
-              - column: { name: mix_type, type: varchar(16) }
-              - column: { name: strength_b, type: "numeric(4,1)" }
-              - column: { name: frost_f, type: varchar(8) }
-              - column: { name: water_w, type: varchar(8) }
-
-  - changeSet:
-      id: 2
-      author: aganethed
-      changes:
-        - createTable:
-            tableName: requests
-            columns:
-              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true } }
-              - column: { name: client_id, type: bigint }
-              - column: { name: status, type: varchar(32) }
-              - column: { name: comment, type: text }
-              - column: { name: created_at, type: timestamp, defaultValueComputed: current_timestamp }
-              - column: { name: updated_at, type: timestamp, defaultValueComputed: current_timestamp }
-
-  - changeSet:
-      id: 3
-      author: aganethed
-      changes:
-        - createTable:
-            tableName: request_items
-            columns:
-              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true } }
-              - column: { name: request_id, type: bigint, constraints: { nullable: false } }
-              - column: { name: product_id, type: bigint, constraints: { nullable: false } }
-              - column: { name: volume_m3, type: "numeric(10,2)" }
-              - column: { name: price_rub, type: "numeric(10,2)" }
-        - addForeignKeyConstraint:
-            baseTableName: request_items
-            baseColumnNames: request_id
-            referencedTableName: requests
-            referencedColumnNames: id
-            constraintName: fk_request_items_requests
-        - addForeignKeyConstraint:
-            baseTableName: request_items
-            baseColumnNames: product_id
-            referencedTableName: products
-            referencedColumnNames: id
-            constraintName: fk_request_items_products
+  - include:
+      file: db/changelog/2025/07/03_create_products_table.yaml
+  - include:
+      file: db/changelog/2025/07/03_create_requests_table.yaml
+  - include:
+      file: db/changelog/2025/07/03_create_request_items_table.yaml

@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-07-03_create_products_table
+      author: aganethed
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true }, remarks: "Идентификатор" }
+              - column: { name: category, type: varchar(32), remarks: "Категория" }
+              - column: { name: price_rub, type: "numeric(10,2)", remarks: "Цена за 1 м3" }
+
+        - createTable:
+            tableName: concrete_products
+            columns:
+              - column: { name: id, type: bigint, constraints: { primaryKey: true, references: products(id) } }
+              - column: { name: grade_mark, type: smallint, remarks: "Марка" }
+              - column: { name: slump_mobility, type: varchar(8), remarks: "Подвижность" }
+              - column: { name: mix_type, type: varchar(16), remarks: "Тип смеси" }
+              - column: { name: compressive_strength, type: "numeric(4,1)", remarks: "Прочность" }
+              - column: { name: frost_resistance, type: varchar(8), remarks: "Морозостойкость" }
+              - column: { name: waterproofing, type: varchar(8), remarks: "Водонепроницаемость" }
+
+        - createTable:
+            tableName: mortar_products
+            columns:
+              - column: { name: id, type: bigint, constraints: { primaryKey: true, references: products(id) } }
+              - column: { name: mark, type: smallint, remarks: "Марка" }
+              - column: { name: mobility, type: varchar(8), remarks: "Подвижность" }

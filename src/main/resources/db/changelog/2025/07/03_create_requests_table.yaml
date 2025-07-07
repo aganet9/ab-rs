@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-07-03_create_requests_table
+      author: aganethed
+      changes:
+        - createTable:
+            tableName: requests
+            columns:
+              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true }, remarks: "Идентификатор" }
+              - column: { name: client_id, type: bigint, remarks: "Идентификатор клиента" }
+              - column: { name: status, type: varchar(32), remarks: "Статус заявки" }
+              - column: { name: comment, type: text, remarks: "Комментарий" }
+              - column: { name: created_at, type: timestamp, defaultValueComputed: current_timestamp, remarks: "Дата создания" }
+              - column: { name: updated_at, type: timestamp, defaultValueComputed: current_timestamp, remarks: "Дата обновления" }

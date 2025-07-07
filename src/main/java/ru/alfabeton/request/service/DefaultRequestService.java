@@ -1,6 +1,8 @@
 package ru.alfabeton.request.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +13,7 @@ import ru.alfabeton.request.entity.Product;
 import ru.alfabeton.request.entity.Request;
 import ru.alfabeton.request.entity.RequestItem;
 import ru.alfabeton.request.enums.RequestStatus;
+import ru.alfabeton.request.exception.RequestNotFoundException;
 import ru.alfabeton.request.mapper.RequestMapper;
 import ru.alfabeton.request.repository.ProductRepository;
 import ru.alfabeton.request.repository.RequestRepository;
@@ -35,7 +38,7 @@ public class DefaultRequestService implements RequestService {
             return;
         }
         BigDecimal total = requestDto.getItems().stream()
-                .map(RequestItemDto::getPriceM3)
+                .map(RequestItemDto::getItemTotalPrice)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         requestDto.setTotalPrice(total);
@@ -53,8 +56,7 @@ public class DefaultRequestService implements RequestService {
     @Override
     public RequestDto findById(Long id) {
         RequestDto requestDto = requestRepository.findById(id)
-                .map(requestMapper::toDto).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
+                .map(requestMapper::toDto).orElseThrow(() -> new RequestNotFoundException(id));
         fillTotal(requestDto);
         return requestDto;
     }
@@ -81,7 +83,7 @@ public class DefaultRequestService implements RequestService {
     @Override
     public RequestDto updateStatus(Long id, RequestStatus requestStatus) {
         Request request = requestRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
+                .orElseThrow(() -> new RequestNotFoundException(id));
         request.setStatus(requestStatus);
         request.setUpdatedAt(LocalDateTime.now());
         RequestDto result = requestMapper.toDto(requestRepository.save(request));
@@ -97,7 +99,7 @@ public class DefaultRequestService implements RequestService {
     @Override
     public RequestItemDto addItem(Long requestId, RequestItemDto requestItemDto) {
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
+                .orElseThrow(() -> new RequestNotFoundException(requestId));
         Product product = productRepository.findById(requestItemDto.getProductId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
 
@@ -115,7 +117,7 @@ public class DefaultRequestService implements RequestService {
     @Override
     public void deleteItem(Long requestId, Long itemId) {
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
+                .orElseThrow(() -> new RequestNotFoundException(requestId));
 
         boolean removed = request.getItems()
                 .removeIf(item -> item.getId().equals(itemId));
@@ -141,7 +143,7 @@ public class DefaultRequestService implements RequestService {
     @Override
     public RequestDto update(Long id, RequestDto requestDto) {
         Request request = requestRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Request not found"));
+                .orElseThrow(() -> new RequestNotFoundException(id));
 
         request.setComment(requestDto.getComment());
         request.setUpdatedAt(LocalDateTime.now());
@@ -165,5 +167,16 @@ public class DefaultRequestService implements RequestService {
         RequestDto result = requestMapper.toDto(requestRepository.save(request));
         fillTotal(result);
         return result;
+    }
+
+    @Override
+    public Page<RequestDto> findAllPaged(Pageable pageable) {
+        Page<Request> page =  requestRepository.findAll(pageable);
+
+        return page.map(request -> {
+            RequestDto dto = requestMapper.toDto(request);
+            fillTotal(dto);
+            return dto;
+        });
     }
 }

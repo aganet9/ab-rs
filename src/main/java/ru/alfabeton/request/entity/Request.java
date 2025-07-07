@@ -45,7 +45,7 @@ public class Request {
     @Builder.Default
     private List<RequestItem> items = new ArrayList<>();
 
-    public void addItem(RequestItem item){
+    public void addItem(RequestItem item) {
         items.add(item);
         item.setRequest(this);
     }

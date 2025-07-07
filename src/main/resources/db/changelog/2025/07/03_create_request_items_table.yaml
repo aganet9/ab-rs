@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025-07-03_create_request_items_table
+      author: aganethed
+      changes:
+        - createTable:
+            tableName: request_items
+            columns:
+              - column: { name: id, type: bigserial, autoIncrement: true, constraints: { primaryKey: true }, remarks: "Идентификатор" }
+              - column: { name: request_id, type: bigint, constraints: { nullable: false }, remarks: "Идентификатор заявки" }
+              - column: { name: product_id, type: bigint, constraints: { nullable: false }, remarks: "Идентификатор продукта" }
+              - column: { name: volume_m3, type: "numeric(10,2)", remarks: "Объем продукта" }
+              - column: { name: price_rub, type: "numeric(10,2)", remarks: "Цена продукта за 1 м3" }
+        - addForeignKeyConstraint:
+            baseTableName: request_items
+            baseColumnNames: request_id
+            referencedTableName: requests
+            referencedColumnNames: id
+            constraintName: fk_request_items_requests
+        - addForeignKeyConstraint:
+            baseTableName: request_items
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_request_items_products
