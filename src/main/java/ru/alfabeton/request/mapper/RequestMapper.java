@@ -20,16 +20,16 @@ public interface RequestMapper {
     Request toEntity(RequestDto requestDto);
 
     @Mapping(source = "product.id", target = "productId")
-    @Mapping(target = "priceM3", expression = "java(calcPriceM3(item))")
+    @Mapping(target = "itemTotalPrice", expression = "java(calcTotalPrice(item))")
     RequestItemDto toDto(RequestItem item);
 
-    @Mapping(source = "productId", target = "product.id")
+    @Mapping(target = "product", ignore = true)
     @Mapping(target = "priceRub", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "request", ignore = true)
     RequestItem toEntity(RequestItemDto dto);
 
-    default BigDecimal calcPriceM3(RequestItem item) {
+    default BigDecimal calcTotalPrice(RequestItem item) {
         if (item.getPriceRub() == null || item.getVolumeM3() == null) {
             return null;
         }

@@ -1,10 +1,7 @@
 package ru.alfabeton.request.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import ru.alfabeton.request.enums.ProductCategory;
 
 import java.math.BigDecimal;
@@ -13,10 +10,10 @@ import java.math.BigDecimal;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "products")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public abstract class Product {
 
     @Id

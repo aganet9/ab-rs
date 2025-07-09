@@ -1,10 +1,7 @@
 package ru.alfabeton.request.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.alfabeton.request.enums.RequestStatus;
 
 import java.time.LocalDateTime;
@@ -14,7 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "requests")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

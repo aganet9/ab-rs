@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.alfabeton.request.dto.RequestDto;
 import ru.alfabeton.request.dto.RequestItemDto;
 import ru.alfabeton.request.dto.RequestStatusUpdateDto;
+import ru.alfabeton.request.dto.RequestUpdateDto;
 import ru.alfabeton.request.service.RequestService;
 
 import java.util.List;
@@ -67,11 +68,11 @@ public class RequestController {
     }
 
     @Operation(summary = "Удалить продукт из заявки")
-    @DeleteMapping("/{requestId}/items/{itemId}")
+    @DeleteMapping("/{requestId}/items/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteItem(@PathVariable Long requestId,
-                           @PathVariable Long itemId) {
-        requestService.deleteItem(requestId, itemId);
+                           @PathVariable Long productId) {
+        requestService.deleteItem(requestId, productId);
     }
 
     @Operation(summary = "Создать пустую заявку")
@@ -84,8 +85,8 @@ public class RequestController {
     @Operation(summary = "Обновить данные существующей заявки")
     @PutMapping("/{id}")
     public RequestDto update(@PathVariable Long id,
-                             @Valid @RequestBody RequestDto requestDto) {
-        return requestService.update(id, requestDto);
+                             @Valid @RequestBody RequestUpdateDto dto) {
+        return requestService.update(id, dto);
     }
 
     @Operation(summary = "Получить список заявок с пагинацией")

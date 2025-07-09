@@ -13,17 +13,29 @@ databaseChangeLog:
         - createTable:
             tableName: concrete_products
             columns:
-              - column: { name: id, type: bigint, constraints: { primaryKey: true, references: products(id) } }
+              - column: { name: id, type: bigint, constraints: { primaryKey: true } }
               - column: { name: grade_mark, type: smallint, remarks: "Марка" }
               - column: { name: slump_mobility, type: varchar(8), remarks: "Подвижность" }
               - column: { name: mix_type, type: varchar(16), remarks: "Тип смеси" }
               - column: { name: compressive_strength, type: "numeric(4,1)", remarks: "Прочность" }
               - column: { name: frost_resistance, type: varchar(8), remarks: "Морозостойкость" }
               - column: { name: waterproofing, type: varchar(8), remarks: "Водонепроницаемость" }
+        - addForeignKeyConstraint:
+            baseTableName: concrete_products
+            baseColumnNames: id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_concrete_products_products
 
         - createTable:
             tableName: mortar_products
             columns:
-              - column: { name: id, type: bigint, constraints: { primaryKey: true, references: products(id) } }
+              - column: { name: id, type: bigint, constraints: { primaryKey: true } }
               - column: { name: mark, type: smallint, remarks: "Марка" }
               - column: { name: mobility, type: varchar(8), remarks: "Подвижность" }
+        - addForeignKeyConstraint:
+            baseTableName: mortar_products
+            baseColumnNames: id
+            referencedTableName: products
+            referencedColumnNames: id
+            constraintName: fk_mortar_products_products

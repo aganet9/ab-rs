@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.alfabeton.request.dto.RequestDto;
 import ru.alfabeton.request.dto.RequestItemDto;
+import ru.alfabeton.request.dto.RequestUpdateDto;
 import ru.alfabeton.request.enums.RequestStatus;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface RequestService {
 
     RequestDto createEmpty (Long clientId);
 
-    RequestDto update(Long id, RequestDto requestDto);
+    RequestDto update(Long id, RequestUpdateDto dto);
 
     Page<RequestDto> findAllPaged(Pageable pageable);
 }

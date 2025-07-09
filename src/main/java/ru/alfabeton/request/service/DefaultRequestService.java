@@ -9,13 +9,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 import ru.alfabeton.request.dto.RequestDto;
 import ru.alfabeton.request.dto.RequestItemDto;
+import ru.alfabeton.request.dto.RequestUpdateDto;
 import ru.alfabeton.request.entity.Product;
 import ru.alfabeton.request.entity.Request;
 import ru.alfabeton.request.entity.RequestItem;
 import ru.alfabeton.request.enums.RequestStatus;
+import ru.alfabeton.request.exception.ProductNotFoundException;
 import ru.alfabeton.request.exception.RequestNotFoundException;
 import ru.alfabeton.request.mapper.RequestMapper;
 import ru.alfabeton.request.repository.ProductRepository;
+import ru.alfabeton.request.repository.RequestItemsRepository;
 import ru.alfabeton.request.repository.RequestRepository;
 
 import java.math.BigDecimal;
@@ -30,6 +33,7 @@ public class DefaultRequestService implements RequestService {
 
     private final RequestRepository requestRepository;
     private final ProductRepository productRepository;
+    private final RequestItemsRepository requestItemsRepository;
     private final RequestMapper requestMapper;
 
     private void fillTotal(RequestDto requestDto) {
@@ -63,19 +67,35 @@ public class DefaultRequestService implements RequestService {
 
     @Override
     public RequestDto create(RequestDto requestDto) {
-        Request request = requestMapper.toEntity(requestDto);
+        Request request = new Request();
+        request.setClientId(requestDto.getClientId());
+        request.setComment(requestDto.getComment());
         request.setStatus(RequestStatus.NEW);
         request.setCreatedAt(LocalDateTime.now());
         request.setUpdatedAt(LocalDateTime.now());
 
-        for (RequestItem requestItem : request.getItems()) {
-            Product product = productRepository.findById(requestItem.getProduct().getId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
-            requestItem.setProduct(product);
-            requestItem.setPriceRub(product.getPriceRub());
-            requestItem.setRequest(request);
+        var requestId = request.getId();
+
+        if (requestDto.getItems() != null) {
+            for (RequestItemDto itemDto : requestDto.getItems()) {
+                Product product = productRepository.findById(itemDto.getProductId())
+                        .orElseThrow(() -> new ProductNotFoundException(itemDto.getProductId()));
+
+                RequestItem item = new RequestItem();
+                item.setRequest(request);
+                item.setProduct(product);
+                item.setPriceRub(product.getPriceRub());
+                item.setVolumeM3(itemDto.getVolumeM3());
+
+                request.addItem(item);
+            }
         }
-        RequestDto result = requestMapper.toDto(requestRepository.save(request));
+
+        request = requestRepository.save(request);
+
+        RequestDto result = requestMapper.toDto(requestRepository.findById(request.getId())
+                .orElseThrow(() -> new RequestNotFoundException(requestId)));
+
         fillTotal(result);
         return result;
     }
@@ -115,14 +135,14 @@ public class DefaultRequestService implements RequestService {
     }
 
     @Override
-    public void deleteItem(Long requestId, Long itemId) {
+    public void deleteItem(Long requestId, Long productId) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
 
-        boolean removed = request.getItems()
-                .removeIf(item -> item.getId().equals(itemId));
+        boolean removed = request.getItems().removeIf(item ->
+                item.getProduct() != null && item.getProduct().getId().equals(productId));
         if (!removed) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found by productId: " + productId);
         }
         requestRepository.save(request);
     }
@@ -141,16 +161,16 @@ public class DefaultRequestService implements RequestService {
     }
 
     @Override
-    public RequestDto update(Long id, RequestDto requestDto) {
+    public RequestDto update(Long id, RequestUpdateDto dto) {
         Request request = requestRepository.findById(id)
                 .orElseThrow(() -> new RequestNotFoundException(id));
 
-        request.setComment(requestDto.getComment());
+        request.setComment(dto.getComment());
         request.setUpdatedAt(LocalDateTime.now());
 
-        if (requestDto.getItems() != null) {
+        if (dto.getItems() != null) {
             request.getItems().clear();
-            for (RequestItemDto item : requestDto.getItems()) {
+            for (RequestItemDto item : dto.getItems()) {
                 Product product = productRepository.findById(item.getProductId())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
 
